@@ -1,0 +1,36 @@
+{
+    "title": "Canada Home Services Directory Scraper Input",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "keyword": {
+            "title": "Keyword",
+            "type": "string",
+            "description": "The specific home services niche (e.g., 'plumber', 'hvac', 'electrician').",
+            "editor": "textfield",
+            "prefill": "plumber"
+        },
+        "location": {
+            "title": "Location (City, Province)",
+            "type": "string",
+            "description": "The Canadian location (e.g., 'Calgary, AB', 'Montreal, QC').",
+            "editor": "textfield",
+            "prefill": "Calgary, AB"
+        },
+        "maxLeads": {
+            "title": "Maximum Leads",
+            "type": "integer",
+            "description": "Maximum number of Canadian home services leads to extract.",
+            "default": 100,
+            "minimum": 1
+        },
+        "proxyConfiguration": {
+            "title": "Proxy Configuration",
+            "type": "object",
+            "description": "Proxy settings. Apify Residential Proxy (Canada targeted) is required.",
+            "prefill": { "useApifyProxy": true },
+            "editor": "proxy"
+        }
+    },
+    "required": ["keyword", "location"]
+}
