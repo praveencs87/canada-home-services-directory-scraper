@@ -45,16 +45,22 @@ try {
             for (const item of items) {
                 if (extractedCount >= maxLeads) break;
 
-                const nameElement = await item.$('.listing__name, h2, .business-name, .listing__title a');
+                const nameElement = await item.$('.listing__name--link, .jsListingName, h2, .business-name, .listing__title a');
                 if (!nameElement) continue;
-                const businessName = (await nameElement.innerText()).trim();
+                const businessName = (await nameElement.innerText()).trim().replace(/^\d+\s*\n+/, '');
 
                 const addressElement = await item.$('.listing__address, .address');
-                const address = addressElement ? (await addressElement.innerText()).trim().replace(/\s+/g, ' ') : '';
+                const address = addressElement ? (await addressElement.innerText()).trim().replace(/\s+/g, ' ').replace(/ Get directions$/i, '') : '';
 
                 // Phones
-                const phoneElement = await item.$('.listing__phone, .phone, a[href^="tel:"]');
-                const phone = phoneElement ? (await phoneElement.innerText()).trim() : '';
+                const phoneElement = await item.$('.mlr__submenu__item h4, [data-phone], .listing__phone, .phone, a[href^="tel:"]');
+                let phone = '';
+                if (phoneElement) {
+                    phone = await phoneElement.getAttribute('data-phone');
+                    if (!phone) {
+                        phone = (await phoneElement.innerText()).trim();
+                    }
+                }
 
                 // Ratings
                 const ratingElement = await item.$('.rating__value, .merchant-rating');
