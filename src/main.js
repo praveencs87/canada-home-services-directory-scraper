@@ -7,8 +7,7 @@ await Actor.init();
 try {
     const input = await Actor.getInput();
     const { 
-        keyword = 'plumber', 
-        location = 'Calgary, AB', 
+        startUrls = [],
         maxLeads = 100,
         proxyConfiguration 
     } = input || {};
@@ -19,7 +18,7 @@ try {
         apifyProxyCountry: 'CA'
     });
 
-    log.info(`Searching YellowPages Canada for "${keyword}" in "${location}"`);
+    log.info(`Searching YellowPages Canada...`);
     await Actor.charge({ eventName: 'apify-actor-start', count: 1 });
 
     let extractedCount = 0;
@@ -73,7 +72,7 @@ try {
 
                 // Services
                 const categoriesElement = await item.$('.listing__category, .categories');
-                const services = categoriesElement ? (await categoriesElement.innerText()).trim() : keyword;
+                const services = categoriesElement ? (await categoriesElement.innerText()).trim() : '';
                 
                 // Website
                 const websiteElement = await item.$('.listing__website a, a.website');
@@ -122,13 +121,14 @@ try {
         }
     });
 
-    // Formatting for YP CA: spaces become +
-    const formatLocation = location.replace(/\s+/g, '+');
-    const startUrl = `https://www.yellowpages.ca/search/si/1/${encodeURIComponent(keyword)}/${formatLocation}`;
-    
-    await crawler.addRequests([{
-        url: startUrl
-    }]);
+    if (startUrls && startUrls.length > 0) {
+        for (const req of startUrls) {
+            await crawler.addRequests([{ url: typeof req === 'string' ? req : req.url }]);
+        }
+    } else {
+        log.warning('No startUrls provided. Using default.');
+        await crawler.addRequests([{ url: 'https://www.homestars.com/nl/st-johns/plumbing' }]);
+    }
 
     armKillSwitch(crawler);
     await crawler.run();
